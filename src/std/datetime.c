@@ -2,9 +2,28 @@
 #include "string.h"
 #include "print.h"
 
+unsigned int month_days[12] = {
+	31, // Jan
+	28, // Feb
+	31, // Mar
+	30, // Apr
+	31, // May
+	30, // Jun
+	31, // Jul
+	31, // Aug
+	30, // Sep
+	31, // Oct
+	30, // Nov
+	31  // Dec
+};
+
 // #include <stdio.h>
 // #include <stdlib.h>
 // #include <math.h>
+
+static unsigned int is_leap_year(unsigned int year){
+	return (year%400==0 || (year%4==0 && year%100!=0));
+}
 
 // MM/DD/YYYY -> 10 chars + 1 null char
 std_date MMDDYYYY_to_date(unsigned char mmddyy[11]){
@@ -30,17 +49,64 @@ std_date MMDDYYYY_to_date(unsigned char mmddyy[11]){
 	unsigned int day = _atoi(day_str);
 	unsigned int year = _atoi(year_str);
 
-	// int month = 1, day=1, year=1999;
+	// int month = 12, day=10, year=2021;
 	std_date date = {month, day, year};
 	return date;
 }
 
 
+std_date next_date(std_date current_date){
+	unsigned int month = current_date.month;
+	unsigned int day = current_date.day;
+	unsigned int year = current_date.year;
+
+	day += 1;
+
+	if(day > month_days[month-1]){
+		day = 1;
+		month++;
+	}
+
+	if(month > 12){
+		month = 1;
+		year++;
+	}
+
+	if(year > 9999){
+		year = 0;
+	}
+
+	std_date next = {month, day, year};
+	return next;
+}
+
+std_date prev_date(std_date current_date){
+	unsigned int month = current_date.month;
+	unsigned int day = current_date.day;
+	unsigned int year = current_date.year;
+
+	day -= 1;
+
+	if(day == 0){
+		if(month == 1){
+			month = 12;
+			year = year-1 ? year>0 : 9999;
+		}
+		else{
+			month = month-1;
+		}
+		day = month_days[month-1];
+	}
+
+	std_date next = {month, day, year};
+	return next;
+}
+
 void print_date(std_date date){
-	printd(date.day);
-	printc(':');
 	printd(date.month);
-	printc(':');
+	printc('/');
+	printd(date.day);
+	printc('/');
 	printd(date.year);
 }
 

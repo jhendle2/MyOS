@@ -210,7 +210,7 @@ unsigned char getch(void){
 
 		if(keycode == KB_BACKSPACE_LOC){
 			bkspc();
-			return 0;
+			return '\b';
 		}
 
 		unsigned char ascii_code = keyboard_map[(unsigned char) keycode];

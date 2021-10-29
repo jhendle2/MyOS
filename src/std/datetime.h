@@ -18,6 +18,8 @@ typedef struct std_time{
 } std_time;
 
 std_date MMDDYYYY_to_date(unsigned char mmddyy[11]);
+std_date next_date(std_date current_date);
 void print_date(std_date date);
+std_date prev_date(std_date current_date);
 
 #endif // DATETIME_H

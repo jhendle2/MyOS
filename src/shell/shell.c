@@ -1,13 +1,52 @@
 #include "../kernel/kernel.h"
+#include "../kernel/sys_props.h"
 
+#include "../std/type.h"
 #include "../std/string.h"
 #include "../std/print.h"
 #include "../std/datetime.h"
 
-#include <stddef.h>
-#include "../memory/heap.h"
+// #include <stddef.h>
+// #include "../memory/heap.h"
 
-char* CURRENT_DIR_STR = "HOME/";
+
+uchar_t shell_buffer[64];
+uint8_t shell_buffer_index;
+
+void clean_shell_buffer(){
+	for(uint8_t i = 0; i<64; i++){
+		shell_buffer[i] = 0;
+	}
+}
+
+void append_shell_buffer(uchar_t c){
+	if(shell_buffer_index<63){
+		shell_buffer[shell_buffer_index++] = c;
+		shell_buffer[shell_buffer_index] = 0;
+	}
+	else{
+		shell_buffer_index = 0;
+		shell_buffer[shell_buffer_index++] = c;
+		shell_buffer[shell_buffer_index] = 0;
+	}
+}
+
+void shell_buffer_backspace(){
+	if(shell_buffer_index>0){
+		if(shell_buffer_index<63)
+			shell_buffer[shell_buffer_index] = 0;
+		shell_buffer_index--;
+	}
+}
+
+void shell_buffer_submit(){
+	
+}
+
+
+/**************************************/
+
+uchar_t* CURRENT_DIR_STR = "HOME/";
 
 #ifndef SHELL_HEADER
 	#define SHELL_HEADER ">"
@@ -21,11 +60,19 @@ void prompt(){
 
 void keyboard_handler_main(void)
 {
-	unsigned char last_char = getch();
+	uchar_t last_char = getch();
+	if(last_char == '\b'){
+		// putch('?');
+		shell_buffer_backspace();
+	}
 	if(last_char == '\n' || atorigin()){
+		prints(shell_buffer);
+		shell_buffer_submit();
+		nl();
 		prompt();
 	}
 	if(isch(last_char)){
+		append_shell_buffer(last_char);
 		putch(last_char);
 	}
 }
@@ -41,43 +88,10 @@ void shell_init(void){
 	clr();
 	prints(welcome);
 	nl();
-	
 
-	unsigned int* k = (int*)malloc(sizeof(unsigned int) * 5);
-	k[0] = 1;
-	k[1] = 3;
-	k[2] = 5;
-	k[3] = 7;
-	k[4] = 9;
-	// printd(k[0]);
-	// printd(k[1]);
-	// printd(k[2]);
-	// printd(k[3]);
-	// printd(k[4]);
-	unsigned char k0 = _itoc(k[0]);
-	unsigned char k1 = _itoc(k[1]);
-	unsigned char k2 = _itoc(k[2]);
-	unsigned char k3 = _itoc(k[3]);
-	unsigned char k4 = _itoc(k[4]);
-
-	// putch(k0);
-	// putch(k1);
-	// putch(k2);
-	// putch(k3);
-	// putch(k4);
-
-	printd(k[0]);
-	printd(k[1]);
-	printd(k[2]);
-	printd(k[3]);
-	printd(k[4]);
-
-	unsigned char date_str[11] = "12/10/2021";
-	std_date d1 = MMDDYYYY_to_date(date_str);
-	print_date(d1);
-
-	// char* dir_str = "TEST";
-	// update_dir(dir_str);
+	prints("Today is ");
+	print_date(SYS_DATE);
+	nl();
 	prompt();
 
 	kernel_init();

@@ -1,9 +1,15 @@
 #include "./shell/shell.h"
 // #include "./std/datetime.h"
+#include "./kernel/sys_props.h"
+
+void init_SYS(){
+	set_SYS_DATE("12/28/2021");
+}
 
 void main(void)
 {
 	update_dir("MAIN");
+	init_SYS();
 	shell_init();
 
 	while(1);
